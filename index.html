@@ -10,13 +10,13 @@
 
 <article>
     <header>
-        <h1>U2SAnon in voice anonymization</h1>
+        <h1>U2SAnon: A Uniform to Speaker Vector Anonymizer in Voice Anonymization</h1>
     </header>
 </article>
-<div><b>Authors:</b> Wenju Gu, Zeyan Liu, Liping Chen, <i>Member, IEEE</i>, Kong Aik Lee, <i>Senior Member, IEEE</i>, Zhen-Hua Ling, <i>Senior Member, IEEE</i>, and Wu Guo</div>
+
 
 <div>
-    <b>Abstract:</b> The state-of-the-art voice anonymization framework is built upon replacing the voice attributes of the original speaker with those of a pseudo-speaker. Existing methods rely on utterance- and speaker-level representations of speaker attributes. Aiming at improving the performance of voice anonymization, this paper proposes a waveform generation model that leverages frame-level speaker modeling. Specifically, attention weights are obtained from the alignment of linguistic content between original and cohort utterances, enabling U2SAnon-dependent estimation of speaker representations for frames in anonymized speech. Experiments conducted on the LibriSpeech and VCTK datasets validated the efficacy of USPAnon in improving voice anonymization performance, particularly regarding de-identification, voice distinctiveness and speech quality. Audio samples can be found in <a href="https://voiceprivacy.github.io/U2SAnon-dependent-frame-level-speaker-modeling/">https://voiceprivacy.github.io/U2SAnon-dependent-frame-level-speaker-modeling/</a>
+    <b>Abstract:</b>  Voice anonymization has emerged as a crucial technique for protecting speaker privacy in the era of advancing speech technologies. While existing methods for pseudo-speaker generation have shown promise, they often face challenges in computational efficiency and speaker distinctiveness. This paper presents U2SAnon, a novel approach to voice anonymization that addresses these limitations through efficient pseudo-speaker generation. Unlike conventional methods that operate directly in the speaker vector space or rely on reference pools, our proposed method samples pseudo-speaker identities from a uniform vector space and maps them to the speaker vector space. This approach significantly reduces computational complexity by eliminating the need for iterative sampling or distribution estimation while maintaining speaker distinctiveness. U2SAnon consists of two key components: a uniform identity vector sampler and a mapper that transforms vectors from the uniform space to the pseudo-speaker vector space. The system preserves the original speech's linguistic content and prosody while effectively anonymizing speaker identity. Experimental results on the LibriSpeech dataset demonstrate the effectiveness of our proposed approach in terms of both computational efficiency and anonymization performance.
 </div>
 
 <br/>
