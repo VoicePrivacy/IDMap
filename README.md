@@ -27,8 +27,7 @@ if __name__ == "__main__":
 In this project, you can extract speaker embeddings using your own dataset. The steps are as follows:
 
 1. **Extract Speaker Embeddings from Your Own Dataset**:
-   - You can follow the process described in the paper to extract speaker embeddings based on emotional features and speaker information.
-   - If you are using the provided dataset for training, make sure you have extracted the corresponding speaker embeddings and loaded them into the training process.
+   - You can follow the process described in the paper to extract speaker embeddings for speaker information.
 
 2. **Verify the Effectiveness**:
    - During training, use the extracted speaker embeddings to evaluate the anonymization effect.
