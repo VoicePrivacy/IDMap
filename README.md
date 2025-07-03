@@ -15,11 +15,9 @@ This project implements a speech anonymization method based on IDMap. The method
 import numpy as np
 
 def generate_uniform_idv(seed, dim=512):
-    """生成基于均匀分布的唯一IDV，通过seed保证可复现性"""
-    np.random.seed(seed)  # 设置唯一种子（如speaker_id、哈希值）
-    return np.random.uniform(-1, 1, dim)  # 在[-1, 1)区间生成dim维向量
+    np.random.seed(seed)  
+    return np.random.uniform(-1, 1, dim) 
 
-# 示例：生成10个唯一IDV（seed从0到9）
 if __name__ == "__main__":
     num_speakers = 10
     for speaker_id in range(num_speakers):
