@@ -22,3 +22,16 @@ if __name__ == "__main__":
     num_speakers = 10
     for speaker_id in range(num_speakers):
         idv = generate_uniform_idv(seed=speaker_id)
+
+## Speaker Embedding Extraction
+In this project, you can extract speaker embeddings using your own dataset. The steps are as follows:
+
+1. **Extract Speaker Embeddings from Your Own Dataset**:
+   - You can follow the process described in the paper to extract speaker embeddings based on emotional features and speaker information.
+   - If you are using the provided dataset for training, make sure you have extracted the corresponding speaker embeddings and loaded them into the training process.
+
+2. **Verify the Effectiveness**:
+   - During training, use the extracted speaker embeddings to evaluate the anonymization effect.
+   - Compare the results using different speaker embeddings extracted from various datasets.
+
+Or you can download the Speaker embedding compressed package provided by us for experiment. The download link is provided at the end of the documentation.
