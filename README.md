@@ -29,9 +29,6 @@ The emotion labels are extracted using the SER model and scripts provided at [ht
 
 #### Preparation step
 
-
-### Inference step
-#### IDMap-MLP inference
 ### Inference step
 #### IDMap-MLP inference
 After preparing the data, run `infer_single.py` to generate anonymized audio examples:
