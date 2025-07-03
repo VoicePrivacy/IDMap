@@ -2,48 +2,35 @@
 ## Demo Page
 # You can access the audio samples at  [https://voiceprivacy.github.io/IDMap/].
 ## Project Overview
-This project implements a speech anonymization method based on IDMap. The method combines acoustic features and emotional information to protect speech privacy while preserving emotional features. 
-
-## File Structure
-- **infer.py**: This file contains the inference code for the model.
-- **models_U2SAnon.py**: This file defines the model architecture, including the network structure used for generating UIDVs and for speech anonymization.
-
-## Content Embedding Extraction
-The extraction of content embeddings can be achieved using the code from the repository [https://github.com/deep-privacy/SA-toolkit/tree/master/egs/asr/librispeech].
-We will provide the pre-trained model weights used in paper. You can download them from the link at the end of this document.
-
-## Speaker Embedding Extraction
-In this project, you can extract speaker embeddings using your own dataset. The steps are as follows:
-
-1. **Extract Speaker Embeddings from Your Own Dataset**:
-   - You can follow the process described in the paper to extract speaker embeddings for speaker information.
-
-2. **Verify the Effectiveness**:
-   - During training, use the extracted speaker embeddings to evaluate the anonymization effect.
-   - Compare the results using different speaker embeddings extracted from various datasets.
-
-Or you can download the Speaker embedding compressed package provided by us for experiment. The download link is provided at the end of the documentation.
-
-### IDV Generation Process
-1. The IDV is a 512-dimensional vector
-2. You can use the functions of 'numpy.random.normal' or 'numpy.random.uniform' in numpy to generate corresponding identity features. Note that each identity feature needs to be set with a unique random seed. egs:
-```python
-import numpy as np
-
-def generate_uniform_idv(seed, dim=512):
-    np.random.seed(seed)  
-    return np.random.uniform(-1, 1, dim) 
-
-if __name__ == "__main__":
-    num_speakers = 10
-    for speaker_id in range(num_speakers):
-        idv = generate_uniform_idv(seed=speaker_id)
-```
+This project implements a speech anonymization method based on IDMap. The method combines acoustic features and emotional information to protect speech privacy while preserving emotional features. For the sake of AI privacy, we will not provide training scripts, but only the inference scripts.
 
 ### Install Dependencies
-Before inference, make sure to install the required dependencies:
+Before inference, make sure to install the required dependencies. First, create a virtual environment using conda:
+```bash
+conda create -n idmap python=3.9
+conda activate idmap
+```
+Then proceed with the following steps:
 ```bash
 git clone https://github.com/VoicePrivacy/IDMap.git
 cd IDMap
 pip install -r requirements.txt
 ```
+The inference process can be completed after the virtual environment is installed.
+
+### Inference Preparation
+Our model requires three parts: content embedding, speaker embedding, and emotion features. 
+
+The content embedding is extracted using the scripts provided at [https://github.com/deep-privacy/SA-toolkit/tree/master/egs/asr/librispeech](https://github.com/deep-privacy/SA-toolkit/tree/master/egs/asr/librispeech). The pre-trained models can be obtained from the download links at the bottom of the document. Additionally, we will provide the content embeddings used in the VPC 2024 evaluation for readers to download and use for evaluation.
+
+The speaker embeddings used in training are extracted using the scripts provided at [https://github.com/Snowdar/asv-subtools/blob/master/pytorch/launcher/runEcapaXvector_online.py](https://github.com/Snowdar/asv-subtools/blob/master/pytorch/launcher/runEcapaXvector_online.py). In this project, they can be directly generated using the IDMap framework without extraction.
+
+The emotion labels are extracted using the SER model and scripts provided at [https://github.com/Sreyan88/MMER](https://github.com/Sreyan88/MMER). We will provide the already-extracted labels for download. 
+
+#### Preparation step
+
+
+### Inference step
+#### IDMap-MLP inference
+
+#### IDMap-Diff inference
