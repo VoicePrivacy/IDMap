@@ -1,6 +1,6 @@
 # IDMap: A Pseudo-Speaker Generator Framework Based on Speaker Identity Index to Vector Mapping
 ## Demo Page
-# You can access the audio samples at  [https://voiceprivacy.github.io/IDMap/).
+# You can access the audio samples at  [https://voiceprivacy.github.io/IDMap/].
 ## Project Overview
 This project implements a speech anonymization method based on IDMap. The method combines acoustic features and emotional information to protect speech privacy while preserving emotional features. 
 
@@ -9,7 +9,7 @@ This project implements a speech anonymization method based on IDMap. The method
 - **models_U2SAnon.py**: This file defines the model architecture, including the network structure used for generating UIDVs and for speech anonymization.
 
 ## Content Embedding Extraction
-The extraction of content embeddings can be achieved using the code from the repository [https://github.com/deep-privacy/SA-toolkit/tree/master/egs/asr/librispeech).
+The extraction of content embeddings can be achieved using the code from the repository [https://github.com/deep-privacy/SA-toolkit/tree/master/egs/asr/librispeech].
 We will provide the pre-trained model weights used in paper. You can download them from the link at the end of this document.
 
 ## Speaker Embedding Extraction
