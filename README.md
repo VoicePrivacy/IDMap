@@ -40,4 +40,11 @@ if __name__ == "__main__":
         idv = generate_uniform_idv(seed=speaker_id)
 ```
 
+### Install Dependencies
+Before inference, make sure to install the required dependencies:
+```bash
+git clone https://github.com/VoicePrivacy/IDMap.git
+cd IDMap
+pip install -r requirements.txt
+
 
