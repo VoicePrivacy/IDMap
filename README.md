@@ -32,5 +32,14 @@ The emotion labels are extracted using the SER model and scripts provided at [ht
 
 ### Inference step
 #### IDMap-MLP inference
+### Inference step
+#### IDMap-MLP inference
+After preparing the data, run `infer_single.py` to generate anonymized audio examples:
+
+```bash
+cd IDMap-MLP
+python infer.py
+```
+In the future, we will provide code for anonymizing LibriSpeech 360, dev, test and other data sets.
 
 #### IDMap-Diff inference
