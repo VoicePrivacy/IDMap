@@ -22,6 +22,7 @@ if __name__ == "__main__":
     num_speakers = 10
     for speaker_id in range(num_speakers):
         idv = generate_uniform_idv(seed=speaker_id)
+```
 
 ## Speaker Embedding Extraction
 In this project, you can extract speaker embeddings using your own dataset. The steps are as follows:
