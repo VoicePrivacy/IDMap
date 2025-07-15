@@ -34,7 +34,7 @@ if __name__ == "__main__":
     
     ## load feature
     c_path = "../data/libri_dev/content/84-121123-0001.pt"
-    fai_vector = torch.load("/home/zyliu/data-78/train-tts100/train/spkembs/19_198_000000_000000.pt").cuda()
+    fai_vector = torch.load("../data/fai.pt").cuda()
     fai_vector = torch.tensor(fai_vector, dtype=torch.float32).unsqueeze(0)
     
     wav_path = "../data/ESD/wav/1.wav"
