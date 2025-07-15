@@ -28,7 +28,7 @@ The speaker embeddings used in training are extracted using the scripts provided
 The emotion labels are extracted using the SER model and scripts provided at [https://github.com/Sreyan88/MMER](https://github.com/Sreyan88/MMER). We will provide the already-extracted labels for download. 
 
 #### Preparation step
-The pre-training model, as well as the characteristics of the corresponding data set used in our evaluation during the experiment, will be uploaded after finishing.
+The pre-trained model, as well as the characteristics of the corresponding data set used in our evaluation during the experiment, will be uploaded after finishing.
 
 ### Inference step
 #### IDMap-MLP inference
