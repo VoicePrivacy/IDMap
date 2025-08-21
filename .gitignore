@@ -2,7 +2,7 @@
 *.wav
 *.flac
 *.mp3
-sample/**/*.wav  # 忽略sample目录下所有内容（包括子目录）
+sample/**/**/*.wav  # 忽略sample目录下所有内容（包括子目录）
 
 # 忽略模型权重文件（如果已通过Git LFS管理，可跳过；否则建议添加）
 *.pt
