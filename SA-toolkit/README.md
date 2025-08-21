@@ -11,7 +11,7 @@
 SA-toolkit is a [pytorch](https://pytorch.org/)-based library providing pipelines and basic building blocs designing speaker anonymization techniques.  
 This library is the result of the work of Pierre Champion's [thesis](https://arxiv.org/abs/2308.04455).  
 
-The extraction of content features is based on the ASR part in the SA-tool.
+The extraction of content features is based on the ASR part in the SA-toolkit.
 
 ## Installation
 
