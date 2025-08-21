@@ -1,0 +1,15 @@
+scikit-learn>=0.24.2
+tensorboard
+carbontracker==2.0.0
+matplotlib
+python-dateutil
+graftr
+kaldiio>=2.15.1
+resampy>=0.2.2
+librosa
+scipy>=1.8
+ffmpeg>=1.4
+tqdm
+safe-gpu
+git+https://github.com/deep-privacy/feerci@dev
+pandas>=1.0.5
