@@ -31,21 +31,6 @@ Another way of installing SA-toolkit is with pip3, this will setup everything fo
 pip3 install 'git+https://github.com/deep-privacy/SA-toolkit.git@master#egg=satools&subdirectory=satools'
 ```
 
-## PyTorch API
-### Torch HUB anonymization example
-
-This locally installs satools with Torch HUB (the required pip dependencies are: `torch` and `torchaudio`).  
-This version gives access to the python/torch model for inference/testing, but for training use `install.sh`.
-You can modify `tag_version` accordingly to the available model tag [here](https://github.com/deep-privacy/SA-toolkit/releases).
-
-```python
-import torch
-
-model = torch.hub.load("deep-privacy/SA-toolkit", "anonymization", tag_version="hifigan_bn_tdnnf_wav2vec2_vq_48_v1", trust_repo=True)
-wav_conv = model.convert(torch.rand((1, 77040)), target="1069")
-asr_bn = model.get_bn(torch.rand((1, 77040))) # (ASR-BN extraction for disentangled linguistic features (best with hifigan_bn_tdnnf_wav2vec2_vq_48_v1))
-```
-
 ## Model training and content feature extraction
 
 Checkout the READMEs of _[egs/asr/librispeech](egs/asr/librispeech)
