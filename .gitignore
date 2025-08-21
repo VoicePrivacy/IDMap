@@ -1,0 +1,20 @@
+# 忽略音频文件（根据你的仓库，sample目录下有大量wav文件）
+*.wav
+*.flac
+*.mp3
+sample/**/*  # 忽略sample目录下所有内容（包括子目录）
+
+# 忽略模型权重文件（如果已通过Git LFS管理，可跳过；否则建议添加）
+*.pt
+*.pth
+*.bin
+models/**/*  # 若有models目录存放权重，直接忽略
+
+# 忽略Python虚拟环境和缓存
+venv/
+env/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
