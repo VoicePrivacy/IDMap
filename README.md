@@ -21,11 +21,11 @@ The inference process can be completed after the virtual environment is installe
 ### Inference Preparation
 Our model requires three parts: content embedding, speaker embedding, and emotion features. 
 
-The content embedding is extracted using the scripts provided at [https://github.com/deep-privacy/SA-toolkit/tree/master/egs/asr/librispeech](https://github.com/deep-privacy/SA-toolkit/tree/master/egs/asr/librispeech). The pre-trained models can be obtained from the download links at the bottom of the document. Additionally, we will provide the content embeddings used in the VPC 2024 evaluation for readers to download and use for evaluation. Please check the specific guidance for extracting content embedding in the _[SA-toolkit](SA-toolkit).
+The content embedding is extracted using the scripts provided at [https://github.com/deep-privacy/SA-toolkit/tree/master/egs/asr/librispeech](https://github.com/deep-privacy/SA-toolkit/tree/master/egs/asr/librispeech). The pre-trained models can be obtained from the download links at the bottom of the document. Additionally, we will provide the content embeddings used in the VPC 2024 evaluation for readers to download and use for evaluation. Please check the specific guidance for extracting content embedding in the [SA-toolkit](SA-toolkit).
 
 The speaker embeddings used in training are extracted using the scripts provided at [https://github.com/Snowdar/asv-subtools/blob/master/pytorch/launcher/runEcapaXvector_online.py](https://github.com/Snowdar/asv-subtools/blob/master/pytorch/launcher/runEcapaXvector_online.py). In this project, they can be directly generated using the IDMap framework without extraction.
 
-The emotion labels are extracted using the SER model and scripts provided at [https://github.com/Sreyan88/MMER](https://github.com/Sreyan88/MMER). We will provide the already-extracted labels for download. 
+The emotion labels are extracted using the SER model and scripts provided at [https://github.com/Sreyan88/MMER](https://github.com/Sreyan88/MMER). 
 
 #### Preparation step
 The pre-trained model, as well as the characteristics of the corresponding data set used in our evaluation during the experiment, will be uploaded after finishing.
