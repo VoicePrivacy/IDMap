@@ -6,13 +6,13 @@ This project implements a speech anonymization method based on IDMap. The method
 
 ### Results
 #### Table I：EER、WER and UAR results
-![EER、WER and UAR](figures/EER_WER_UAR.pdf)
+- [EER、WER and UAR](figures/EER_WER_UAR.pdf)
 
 #### Table II: Gvd (Gain of voice distinctness) results
-![Gvd](figures/Gvd.pdf)
+- [Gvd](figures/Gvd.pdf)
 
 #### 图3：RTFs
-![RTFs](figures/RTFs.pdf)
+- [RTFs](figures/RTFs.pdf)
 
 ### Install Dependencies
 Before inference, make sure to install the required dependencies. First, create a virtual environment using conda:
