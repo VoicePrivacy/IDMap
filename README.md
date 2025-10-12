@@ -4,6 +4,8 @@
 ## Project Overview
 This project implements a speech anonymization method based on IDMap. The method combines acoustic features and emotional information to protect speech privacy while preserving emotional features. For the sake of AI privacy, we will not provide training scripts, but only the inference scripts.
 
+Additionally, this repository also serves as a supplement to the paper titled *IMPROVING THE UNIQUENESS AND EFFICIENCY IN VOICE ANONYMIZATION WITH INDEX TO VECTOR MAPPING*. The method proposed in this paper corresponds to the **IDMap-MLP** module in the current repository.
+
 ### Results
 #### Table I：EER、WER and UAR results
 ![EER、WER and UAR](figures/EER_WER_UAR.png)
