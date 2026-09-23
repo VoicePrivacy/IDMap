@@ -1,0 +1,78 @@
+# Backend-native IDMap training and synthesis
+
+This directory supplements the original IDMap inference release. It contains the research implementation used to train separate IDMap models for each speech generator. **No speaker-embedding dataset or trained IDMap checkpoint is included in the Git repository.** These files must not be confused with the original paper's published weights.
+
+## Layout
+
+| Path | Purpose |
+| --- | --- |
+| `src/voice_anon/idmap/mlp.py` | MLP, deterministic index vectors, and cosine/Euclidean training loss |
+| `src/voice_anon/idmap/diffusion.py` | VP-SDE paper variant and an additional EDM variant |
+| `scripts/train_idmap_mlp.py` | MLP training and resumable checkpoints |
+| `scripts/train_idmap_diff.py` | Diffusion training and resumable checkpoints |
+| `scripts/generate_qwen3tts_idmap_worker.py` | Batched Qwen3-TTS synthesis with native 1024-D IDMap-MLP or IDMap-Diff |
+| `scripts/generate_cosyvoice3_multigpu_worker.py` | Batched CosyVoice3 synthesis with native 192-D IDMap-MLP or IDMap-Diff |
+
+Install the backend's upstream runtime separately. Add this repository's `src` to `PYTHONPATH` (for example `export PYTHONPATH="$PWD/src"`). The training core needs Python, NumPy, and PyTorch. Qwen synthesis needs the official `qwen-tts`, torchaudio, and soundfile runtimes. CosyVoice synthesis additionally needs the official CosyVoice runtime, Matcha-TTS, S3Tokenizer, HyperPyYAML, Transformers, torchaudio, and soundfile. Use a compatible upstream environment; the legacy top-level `requirements.txt` is for the original release and is not a pinned native-backend environment.
+
+## Data and training
+
+Create one `.npz` archive containing `embeddings` (float32 array of shape `[utterances, D]`) and `speaker_ids` (same number of string labels). Extract embeddings with the **same encoder weights** as the target synthesizer: native Qwen3-TTS Base speaker encoder (`D=1024`) or the exact CosyVoice3 `campplus.onnx` (`D=192`). Keep train/development/test speakers disjoint. The archive is not distributed here.
+
+```bash
+export PYTHONPATH="$PWD/src"
+python scripts/train_idmap_mlp.py \
+  --embeddings /path/to/native_embeddings.npz \
+  --speaker-space 'cosyvoice3-campplus-v1:<campplus-sha256-prefix>' \
+  --output-dir /path/to/idmap-mlp-run
+python scripts/train_idmap_diff.py \
+  --embeddings /path/to/native_embeddings.npz \
+  --speaker-space 'cosyvoice3-campplus-v1:<campplus-sha256-prefix>' \
+  --output-dir /path/to/idmap-diff-run --variant paper_vp_sde
+```
+
+For Qwen, use the recorded `qwen3tts-12hz-0p6b-base-xvector-v1:<model-fingerprint-prefix>` speaker-space label and 1024-D embeddings. The `edm` diffusion variant is an additional backend-normalized experiment, not the original paper variant. Every `best.pt` contains weights, configuration, dimensionality, and a fixed auxiliary vector. Only load checkpoints you trust: PyTorch pickle files can execute code.
+
+Before publishing one of our own checkpoints, run `scripts/export_idmap_inference_checkpoint.py --checkpoint /path/to/best.pt --output /path/to/inference.pt`. The export removes optimizer/RNG state, local training paths, and the training-speaker list while preserving the fields required by both synthesis workers. Verify its printed SHA-256 and run a synthesis smoke against the intended vendor model before uploading.
+
+## Synthesis manifest
+
+One JSON object per line:
+
+```json
+{"utterance_id":"example-001","text":"Hello there.","anonymous_index":12345,"output_relative_path":"example-001.wav"}
+```
+
+Reuse one `anonymous_index` for every turn of the same session-local identity; use distinct indices for different identities. Do not use a reference transcript, RTTM, or a ground-truth speaker label as a prediction-time input. Manifest outputs must be relative paths. The workers shard records by `rank/world-size`; give each rank its own visible GPU.
+
+Qwen3-TTS Base (vector-only, no reference audio; replace the checkpoint with a 1024-D IDMap-Diff checkpoint to use diffusion):
+
+```bash
+CUDA_VISIBLE_DEVICES=0 python scripts/generate_qwen3tts_idmap_worker.py \
+  --manifest /path/to/manifest.jsonl --output-dir /path/to/output \
+  --model-dir /path/to/Qwen3-TTS-12Hz-0.6B-Base \
+  --idmap-checkpoint /path/to/qwen-1024d-idmap-mlp/best.pt \
+  --expected-speaker-space-prefix qwen3tts-12hz-0p6b-base-xvector-v1 \
+  --rank 0 --world-size 1 --batch-size 16
+```
+
+CosyVoice3 (vector-only prompt mode; the model's native 192-D IDMap checkpoint is required):
+
+```bash
+CUDA_VISIBLE_DEVICES=0 python scripts/generate_cosyvoice3_multigpu_worker.py \
+  --manifest /path/to/manifest.jsonl --output-dir /path/to/output \
+  --model-dir /path/to/Fun-CosyVoice3-0.5B \
+  --hf-model-dir /path/to/Fun-CosyVoice3-0.5B/hf_merged \
+  --idmap-checkpoint /path/to/cosy-192d-idmap-mlp/best.pt \
+  --prompt-mode none --rank 0 --world-size 1 --llm-batch-size 8
+```
+
+The CosyVoice worker also accepts an IDMap-Diff checkpoint in the same native space. It expects the `hf_merged` layout and metadata generated by the upstream CosyVoice `runtime/triton_trtllm/scripts/convert_cosyvoice3_to_hf.py` conversion script, which is **not** an official downloaded model layout. Do not claim that downloading the upstream model alone makes that worker runnable. The worker verifies the checkpoint's `campplus.onnx` hash. Qwen verifies its checkpoint against the selected base-model fingerprint.
+
+## Model downloads
+
+- Official Qwen3-TTS Base weights: [Qwen/Qwen3-TTS-12Hz-0.6B-Base](https://huggingface.co/Qwen/Qwen3-TTS-12Hz-0.6B-Base).
+- Official CosyVoice3 weights: [FunAudioLLM/Fun-CosyVoice3-0.5B-2512](https://huggingface.co/FunAudioLLM/Fun-CosyVoice3-0.5B-2512).
+- Backend-specific IDMap-MLP and IDMap-Diff checkpoints: **not yet hosted**. A release requires the trained files, SHA-256 verification, distribution rights, and an authorized publishing account. No download link is claimed until the uploaded bytes are verified.
+
+These upstream links are to the vendors' weights, not fine-tuned weights produced by this repository. Follow each upstream model's license and access terms.
