@@ -73,6 +73,7 @@ The CosyVoice worker also accepts an IDMap-Diff checkpoint in the same native sp
 
 - Official Qwen3-TTS Base weights: [Qwen/Qwen3-TTS-12Hz-0.6B-Base](https://huggingface.co/Qwen/Qwen3-TTS-12Hz-0.6B-Base).
 - Official CosyVoice3 weights: [FunAudioLLM/Fun-CosyVoice3-0.5B-2512](https://huggingface.co/FunAudioLLM/Fun-CosyVoice3-0.5B-2512).
-- Backend-specific IDMap-MLP and IDMap-Diff checkpoints: **not yet hosted**. A release requires the trained files, SHA-256 verification, distribution rights, and an authorized publishing account. No download link is claimed until the uploaded bytes are verified.
+- CosyVoice3 native 192-D IDMap-MLP inference checkpoint: [download from the v0.1.0 research pre-release](https://github.com/VoicePrivacy/IDMap/releases/download/v0.1.0-native-idmap/cosyvoice3_campplus_192d_idmap_mlp_inference.pt). SHA-256: `23f2ef9212eaab0aa966538a3b2077661256e8868aa6c081990db16e9315cdeb`. Speaker space: `cosyvoice3-campplus-v1:a6ac6a63997761ae`. The exported checkpoint was structurally loaded and generated finite native vectors; full vendor synthesis with this export has not yet been rerun.
+- Qwen3-TTS native 1024-D IDMap-MLP and backend-specific IDMap-Diff checkpoints: **not yet hosted**. Do not substitute the CosyVoice3 checkpoint for these models. No download link is claimed until the trained bytes and compatibility are verified.
 
 These upstream links are to the vendors' weights, not fine-tuned weights produced by this repository. Follow each upstream model's license and access terms.
