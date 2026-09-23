@@ -2,7 +2,11 @@
 ## Demo Page
 # You can access the audio samples at  [https://voiceprivacy.github.io/IDMap/].
 ## Project Overview
-This project implements a speech anonymization method based on IDMap. The method combines acoustic features and emotional information to protect speech privacy while preserving emotional features. For the sake of AI privacy, we will not provide training scripts, but only the inference scripts.
+This project implements a speech anonymization method based on IDMap. The method combines acoustic features and emotional information to protect speech privacy while preserving emotional features.
+
+The original inference implementation remains in `IDMap-MLP/` and `IDMap-Diff/`. A separate, backend-native implementation of MLP and diffusion training plus Qwen3-TTS and CosyVoice3 synthesis is in [`src/voice_anon/`](src/voice_anon/) and [`scripts/`](scripts/). These implementations are not interchangeable with the original inference checkpoints: the newer models are trained in the target synthesizer's own speaker-vector space.
+
+See [the native training and synthesis guide](docs/native_training_and_synthesis.md) for data format, commands, checkpoint compatibility, model links, and release status. Do not feed 192-dimensional CosyVoice3 vectors to Qwen3-TTS, or 1024-dimensional Qwen3-TTS vectors to CosyVoice3.
 
 Additionally, this repository also serves as a supplement to the paper titled *Improving the Uniqueness and Efficiency in Voice Anonymization with Index to Vector Mapping*. The method proposed in this paper corresponds to the **IDMap-MLP** module in the current repository.
 
@@ -63,4 +67,3 @@ cd IDMap-Diff
 python infer.py
 ```
 In the future, we will provide code for anonymizing LibriSpeech 360, dev, test and other data sets.
-
