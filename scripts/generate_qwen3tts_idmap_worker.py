@@ -173,7 +173,7 @@ def main() -> None:
     auxiliary = checkpoint["fixed_auxiliary_vector"].to("cuda:0", dtype=torch.float32)
     speaker_adapter = None
     if args.speaker_adapter_checkpoint:
-        from generate_qwen3tts_utterance_pool_worker import SpeakerConditioningAdapter
+        from voice_anon.backends.qwen3tts import SpeakerConditioningAdapter
         adapted = torch.load(args.speaker_adapter_checkpoint, map_location="cpu", weights_only=False)
         if not adapted["config"].get("speaker_conditioning_only"):
             raise ValueError("not a speaker-conditioning adapter")

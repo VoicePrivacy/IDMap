@@ -70,7 +70,9 @@ def main() -> None:
     rng = np.random.default_rng(args.seed)
     device = torch.device(args.device)
 
-    corpus = SpeakerEmbeddingCorpus.load(args.embeddings)
+    corpus = SpeakerEmbeddingCorpus.load(
+        args.embeddings, expected_speaker_space=args.speaker_space
+    )
     embedding_dimension = int(corpus.embeddings.shape[1])
     sampler = IdentityVectorSampler(
         dimension=embedding_dimension,
