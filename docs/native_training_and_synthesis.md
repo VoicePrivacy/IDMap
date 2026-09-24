@@ -8,31 +8,87 @@ This directory supplements the original IDMap inference release. It contains the
 | --- | --- |
 | `src/voice_anon/idmap/mlp.py` | MLP, deterministic index vectors, and cosine/Euclidean training loss |
 | `src/voice_anon/idmap/diffusion.py` | VP-SDE paper variant and an additional EDM variant |
+| `scripts/extract_qwen3tts_speaker_embeddings.py` | Native Qwen3-TTS Base 1024-D embedding extraction and batch/single audit |
+| `scripts/extract_cosyvoice3_speaker_embeddings.py` | Native CosyVoice3 CAM++ 192-D extraction and batch/single audit |
 | `scripts/train_idmap_mlp.py` | MLP training and resumable checkpoints |
 | `scripts/train_idmap_native_diversity_full_20260904.py` | Exact full-corpus native-diversity variant used for the released Qwen3-TTS 1024-D checkpoint |
 | `scripts/train_idmap_diff.py` | Diffusion training and resumable checkpoints |
 | `scripts/generate_qwen3tts_idmap_worker.py` | Batched Qwen3-TTS synthesis with native 1024-D IDMap-MLP or IDMap-Diff |
 | `scripts/generate_cosyvoice3_multigpu_worker.py` | Batched CosyVoice3 synthesis with native 192-D IDMap-MLP or IDMap-Diff |
 
-Install the backend's upstream runtime separately. Add this repository's `src` to `PYTHONPATH` (for example `export PYTHONPATH="$PWD/src"`). The training core needs Python, NumPy, and PyTorch. Qwen synthesis needs the official `qwen-tts`, torchaudio, and soundfile runtimes. CosyVoice synthesis additionally needs the official CosyVoice runtime, Matcha-TTS, S3Tokenizer, HyperPyYAML, Transformers, torchaudio, and soundfile. Use a compatible upstream environment; the legacy top-level `requirements.txt` is for the original release and is not a pinned native-backend environment.
+Install the backend's upstream runtime separately. Use a Python 3.10+ environment
+and a CUDA-compatible PyTorch/torchaudio build for your machine. Then install
+this package in editable mode with `python -m pip install -e '.[audio,test]'`.
+Qwen synthesis also needs the official `qwen-tts` runtime (`python -m pip
+install qwen-tts`). CosyVoice synthesis additionally needs the official
+[CosyVoice source tree](https://github.com/FunAudioLLM/CosyVoice), Matcha-TTS,
+S3Tokenizer, HyperPyYAML, Transformers, torchaudio, and soundfile. Install
+CosyVoice using its own pinned vendor environment; add its `python_packages`,
+repository root and `third_party/Matcha-TTS` paths to `PYTHONPATH`. The vendor
+`runtime/triton_trtllm/scripts/convert_cosyvoice3_to_hf.py` must be run with
+`--model-dir /path/to/Fun-CosyVoice3-0.5B-2512 --output-dir
+/path/to/Fun-CosyVoice3-0.5B-2512/hf_merged --dtype bfloat16` before the
+CosyVoice batch worker. The conversion needs the *original vendor* model
+files; its output is not supplied by the official model download. Use
+`python -m pytest -q tests` as a code smoke, not an audio-quality result.
+The legacy top-level `requirements.txt` is for the original release and is
+not a pinned native-backend environment.
 
 ## Data and training
 
-Create one `.npz` archive containing `embeddings` (float32 array of shape `[utterances, D]`) and `speaker_ids` (same number of string labels). Extract embeddings with the **same encoder weights** as the target synthesizer: native Qwen3-TTS Base speaker encoder (`D=1024`) or the exact CosyVoice3 `campplus.onnx` (`D=192`). Keep train/development/test speakers disjoint. The archive is not distributed here.
+Create one `.npz` archive containing `embeddings` (float32 array of shape
+`[utterances, D]`), `speaker_ids` (same number of string labels), and
+`speaker_space` (a scalar string fingerprint). The trainers now reject a
+missing or mismatched `speaker_space`. Extract embeddings with the **same
+encoder weights** as the target synthesizer: native Qwen3-TTS Base speaker
+encoder (`D=1024`) or the exact CosyVoice3 `campplus.onnx` (`D=192`). The
+extractors expect `AUDIO_ROOT/SPEAKER_ID/.../*.wav` or `.flac`; they use a
+deterministic 3-second crop/repeat and check a small batch/single sample.
+They do not extract dialogue identity labels. For a new evaluation, keep
+training and test speakers disjoint. The training archives are not distributed
+here.
+
+```bash
+# Qwen3-TTS extraction: one GPU, batched. Its JSON sidecar records speaker_space.
+python scripts/extract_qwen3tts_speaker_embeddings.py \
+  --audio-root /path/to/LibriSpeech/train-clean-360 \
+  --model-dir /path/to/Qwen3-TTS-12Hz-0.6B-Base \
+  --speaker-space-name qwen3tts-12hz-0p6b-base-xvector-v1 \
+  --output /path/to/qwen-native-1024d.npz \
+  --batch-size 128 --num-workers 8
+
+# CosyVoice3 extraction: batched ONNX CAM++, no Qwen model involved.
+python scripts/extract_cosyvoice3_speaker_embeddings.py \
+  --audio-root /path/to/LibriSpeech/train-clean-360 \
+  --campplus-onnx /path/to/Fun-CosyVoice3-0.5B-2512/campplus.onnx \
+  --output /path/to/cosy-native-192d.npz \
+  --batch-size 64 --num-workers 8
+```
+
+Read the exact `speaker_space` value from the extractor's `.manifest.json`
+sidecar and pass it unchanged to `--speaker-space` below. Do not invent the
+fingerprint or mix files from different vendor revisions.
 
 ```bash
 export PYTHONPATH="$PWD/src"
 python scripts/train_idmap_mlp.py \
   --embeddings /path/to/native_embeddings.npz \
-  --speaker-space 'cosyvoice3-campplus-v1:<campplus-sha256-prefix>' \
+  --speaker-space 'cosyvoice3-campplus-v1:<actual-campplus-sha256-prefix>' \
   --output-dir /path/to/idmap-mlp-run
 python scripts/train_idmap_diff.py \
   --embeddings /path/to/native_embeddings.npz \
-  --speaker-space 'cosyvoice3-campplus-v1:<campplus-sha256-prefix>' \
+  --speaker-space 'cosyvoice3-campplus-v1:<actual-campplus-sha256-prefix>' \
   --output-dir /path/to/idmap-diff-run --variant paper_vp_sde
 ```
 
-For Qwen, use the recorded `qwen3tts-12hz-0p6b-base-xvector-v1:<model-fingerprint-prefix>` speaker-space label and 1024-D embeddings. The `edm` diffusion variant is an additional backend-normalized experiment, not the original paper variant. Every `best.pt` contains weights, configuration, dimensionality, and a fixed auxiliary vector. Only load checkpoints you trust: PyTorch pickle files can execute code.
+For Qwen, use the **actual extractor-recorded**
+`qwen3tts-12hz-0p6b-base-xvector-v1:<model-fingerprint-prefix>` label and
+1024-D embeddings. The `edm` diffusion variant is an additional
+backend-normalized experiment, not the original paper variant. Every
+`best.pt` contains weights, configuration, dimensionality, and a fixed
+auxiliary vector. Only load checkpoints you trust: PyTorch pickle files can
+execute code. A newly trained IDMap-Diff must be evaluated in the same
+generator/encoder space before its weight is released.
 
 Before publishing one of our own checkpoints, run `scripts/export_idmap_inference_checkpoint.py --checkpoint /path/to/best.pt --output /path/to/inference.pt`. The export removes optimizer/RNG state, local training paths, and the training-speaker list while preserving the fields required by both synthesis workers. Verify its printed SHA-256 and run a synthesis smoke against the intended vendor model before uploading.
 
