@@ -131,6 +131,21 @@ transcribe speech. The worker synthesizes the supplied text; it does not read
 source audio. For VPC-style per-utterance re-randomization, assign a different
 index to each utterance. The Qwen worker writes 16-kHz PCM WAVs.
 
+For a large manifest, [`prepare_idmap_manifest.py`](scripts/prepare_idmap_manifest.py)
+assigns distinct indices without collisions. Its input JSONL needs
+`utterance_id` and `text`; `--mode utterance` gives every utterance a new
+pseudo-speaker. With `--mode session`, each row additionally needs `session_id`
+and `local_speaker_id` from **your own evaluated speaker tracker**. It reuses
+one index for repeated local IDs and rotates it between sessions. It does not
+derive speaker IDs from the audio or permit oracle labels in a claimed
+end-to-end evaluation.
+
+```bash
+python scripts/prepare_idmap_manifest.py \
+  --input-jsonl /path/to/text_and_tracker_output.jsonl \
+  --output manifest.jsonl --mode session --seed 20260924
+```
+
 ```bash
 CUDA_VISIBLE_DEVICES=0 python scripts/generate_qwen3tts_idmap_worker.py \
   --manifest manifest.jsonl --output-dir /path/to/anonymized \
@@ -145,11 +160,31 @@ checkpoint, `--prompt-mode none`, the original vendor checkpoint and the
 converted `hf_merged` directory. Exact commands, batching caveats, and
 checkpoint-compatibility checks are in the
 [training and synthesis guide](docs/native_training_and_synthesis.md).
-To shard across GPUs, launch one worker per GPU, each with a distinct
-`CUDA_VISIBLE_DEVICES`, rank `0..N-1`, and common `--world-size N`; the manifest
-is deterministically partitioned by rank. Audit the output WAV count and ASR
-quality before reporting a result. Qwen generation supports batched text;
-batch/single waveforms are not claimed identical under stochastic decoding.
+The [launcher](scripts/launch_idmap_generation.py) starts one worker per GPU,
+sets rank/world-size consistently, and writes an audit with the expected,
+valid and failed WAV denominators. For example:
+
+```bash
+python scripts/launch_idmap_generation.py --backend qwen --gpus 0,1 \
+  --manifest manifest.jsonl --output-dir /path/to/qwen-audio \
+  --model-dir /path/to/Qwen3-TTS-12Hz-0.6B-Base \
+  --idmap-checkpoint checkpoints/downloaded/qwen-idmap-mlp.pt \
+  --expected-speaker-space-prefix qwen3tts-12hz-0p6b-base-xvector-v1 \
+  --batch-size 16
+
+python scripts/launch_idmap_generation.py --backend cosy --gpus 2,3 \
+  --manifest manifest.jsonl --output-dir /path/to/cosy-audio \
+  --model-dir /path/to/Fun-CosyVoice3-0.5B-2512 \
+  --hf-model-dir /path/to/Fun-CosyVoice3-0.5B-2512/hf_merged \
+  --idmap-checkpoint checkpoints/downloaded/cosy-idmap-mlp.pt \
+  --batch-size 8
+```
+
+The selected GPUs must actually be free; the launcher never stops other
+processes. Audit the output WAV count and ASR quality before reporting a
+result. Qwen supports batched text, but batch/single waveforms are not claimed
+identical under stochastic decoding. The two backends use separate native
+speaker spaces and separate model weights.
 
 ## Legacy paper implementation
 
