@@ -13,6 +13,7 @@ This directory supplements the original IDMap inference release. It contains the
 | `scripts/train_idmap_mlp.py` | MLP training and resumable checkpoints |
 | `scripts/train_idmap_native_diversity_full_20260904.py` | Exact full-corpus native-diversity variant used for the released Qwen3-TTS 1024-D checkpoint |
 | `scripts/train_idmap_diff.py` | Diffusion training and resumable checkpoints |
+| `scripts/verify_idmap_checkpoint.py` | Check trusted export SHA, speaker space, strict loading, and finite generated vectors |
 | `scripts/generate_qwen3tts_idmap_worker.py` | Batched Qwen3-TTS synthesis with native 1024-D IDMap-MLP or IDMap-Diff |
 | `scripts/generate_cosyvoice3_multigpu_worker.py` | Batched CosyVoice3 synthesis with native 192-D IDMap-MLP or IDMap-Diff |
 
