@@ -13,7 +13,7 @@ Download with `curl -fL -o FILE URL`, then verify with `sha256sum FILE`
 Official Qwen3-TTS and CosyVoice3 generator weights must be downloaded from
 their respective model publishers; they are not bundled here.
 
-The original paper's `IDMap-Diff/` implementation and the newer
+The original paper's `Original/IDMap-Diff/` implementation and the separate
 `src/voice_anon/idmap/diffusion.py` training implementation are available.
 **No compatible, verified IDMap-Diffusion trained checkpoint is published.**
 Historical runs referenced an OIT path that is currently inaccessible. Do not

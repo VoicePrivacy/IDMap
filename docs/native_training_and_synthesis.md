@@ -34,8 +34,8 @@ repository root and `third_party/Matcha-TTS` paths to `PYTHONPATH`. The vendor
 CosyVoice batch worker. The conversion needs the *original vendor* model
 files; its output is not supplied by the official model download. Use
 `python -m pytest -q tests` as a code smoke, not an audio-quality result.
-The legacy top-level `requirements.txt` is for the original release and is
-not a pinned native-backend environment.
+The [`Original/requirements.txt`](../Original/requirements.txt) file belongs to
+the original paper implementation and is not a pinned native-backend environment.
 
 ## Data and training
 
