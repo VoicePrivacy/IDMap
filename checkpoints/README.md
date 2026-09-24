@@ -14,9 +14,6 @@ Official Qwen3-TTS and CosyVoice3 generator weights must be downloaded from
 their respective model publishers; they are not bundled here.
 
 The original paper's `Original/IDMap-Diff/` implementation and the separate
-`src/voice_anon/idmap/diffusion.py` training implementation are available.
-**No compatible, verified IDMap-Diffusion trained checkpoint is published.**
-Historical runs referenced an OIT path that is currently inaccessible. Do not
-substitute an MLP checkpoint or an unverified diffusion checkpoint. The
+`src/voice_anon/idmap/diffusion.py` training implementation are available. The
 `scripts/train_idmap_diff.py` entry point can produce a new checkpoint after
 extracting backend-native speaker vectors.
