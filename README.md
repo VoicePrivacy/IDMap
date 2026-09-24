@@ -1,69 +1,148 @@
-# IDMap: A Pseudo-Speaker Generator Framework Based on Speaker Identity Index to Vector Mapping
-## Demo Page
-# You can access the audio samples at  [https://voiceprivacy.github.io/IDMap/].
-## Project Overview
-This project implements a speech anonymization method based on IDMap. The method combines acoustic features and emotional information to protect speech privacy while preserving emotional features.
+# IDMap: backend-native anonymous speaker vectors
 
-The original inference implementation remains in `IDMap-MLP/` and `IDMap-Diff/`. A separate, backend-native implementation of MLP and diffusion training plus Qwen3-TTS and CosyVoice3 synthesis is in [`src/voice_anon/`](src/voice_anon/) and [`scripts/`](scripts/). These implementations are not interchangeable with the original inference checkpoints: the newer models are trained in the target synthesizer's own speaker-vector space.
+IDMap maps a reproducible anonymous identity index to a speaker vector in the
+**specific speaker-conditioning space used by a synthesizer**. This repository
+retains the original paper code in [`IDMap-MLP/`](IDMap-MLP/) and
+[`IDMap-Diff/`](IDMap-Diff/). The maintained backend-native training and
+synthesis implementation is in [`src/voice_anon/`](src/voice_anon/) and
+[`scripts/`](scripts/). The two implementations and their checkpoints are not
+interchangeable.
 
-See [the native training and synthesis guide](docs/native_training_and_synthesis.md) for data format, commands, checkpoint compatibility, model links, and release status. Do not feed 192-dimensional CosyVoice3 vectors to Qwen3-TTS, or 1024-dimensional Qwen3-TTS vectors to CosyVoice3.
+The original paper is *Improving the Uniqueness and Efficiency in Voice
+Anonymization with Index to Vector Mapping*. Its [audio samples](https://voiceprivacy.github.io/IDMap/)
+and [legacy usage notes](docs/legacy_idmap.md) remain available.
 
-Additionally, this repository also serves as a supplement to the paper titled *Improving the Uniqueness and Efficiency in Voice Anonymization with Index to Vector Mapping*. The method proposed in this paper corresponds to the **IDMap-MLP** module in the current repository.
+## What is currently released
 
-### Results
-#### Table I：EER、WER and UAR results
-![EER、WER and UAR](figures/EER_WER_UAR.png)
+| Generator | IDMap-MLP speaker space | Verified inference weight | IDMap-Diffusion weight |
+| --- | --- | --- | --- |
+| Qwen3-TTS 12Hz 0.6B Base | Native 1024-D x-vector | [Download](https://github.com/VoicePrivacy/IDMap/releases/download/v0.1.0-native-idmap/qwen3tts_librispeech360_1024d_idmap_mlp_inference.pt) | Not verified or released |
+| Original CosyVoice3 0.5B | Native 192-D CAM++ | [Download](https://github.com/VoicePrivacy/IDMap/releases/download/v0.1.0-native-idmap/cosyvoice3_campplus_192d_idmap_mlp_inference.pt) | Not verified or released |
 
+See [checkpoint checksums and provenance](checkpoints/README.md). These are
+inference-only IDMap weights, **not** the Qwen3-TTS or CosyVoice3 generator
+weights. Download the latter from their official publishers. In particular,
+do not feed a 192-D CosyVoice3 IDMap vector to Qwen3-TTS or vice versa.
+The Qwen3-TTS MLP completed ten LibriSpeech train-clean-360 epochs; its small
+development rendering check is **not** a formal VPC result. No corresponding
+IDMap-Diffusion checkpoint has passed provenance and compatibility checks, so
+none is linked here.
 
+## Install
 
-#### Table II: Gvd (Gain of voice distinctness) results
-![Gvd](figures/Gvd.png)
+Use separate environments for Qwen3-TTS and CosyVoice3, because their vendor
+dependencies differ. A CUDA-compatible PyTorch and torchaudio installation is
+required for synthesis; install those from the PyTorch selector for your CUDA
+runtime before installing this package. Python 3.10 or newer is required for
+the maintained code; the legacy code has separate requirements.
 
-#### 图3：RTFs
-![RTFs](figures/RTFs.png)
-
-
-### Install Dependencies
-Before inference, make sure to install the required dependencies. First, create a virtual environment using conda:
-```bash
-conda create -n idmap python=3.9
-conda activate idmap
-```
-Then proceed with the following steps:
 ```bash
 git clone https://github.com/VoicePrivacy/IDMap.git
 cd IDMap
-pip install -r requirements.txt
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install -e '.[audio,test]'
+python -m pytest -q tests
 ```
-The inference process can be completed after the virtual environment is installed.
 
-### Inference Preparation
-Our model requires three parts: content embedding, speaker embedding, and emotion features. 
+For Qwen3-TTS, additionally install the official `qwen-tts` runtime and
+download [Qwen3-TTS-12Hz-0.6B-Base](https://huggingface.co/Qwen/Qwen3-TTS-12Hz-0.6B-Base).
+For CosyVoice3, follow the [official CosyVoice installation](https://github.com/FunAudioLLM/CosyVoice),
+including its Matcha-TTS and S3Tokenizer dependencies, and download
+[Fun-CosyVoice3-0.5B-2512](https://huggingface.co/FunAudioLLM/Fun-CosyVoice3-0.5B-2512).
+The CosyVoice3 batch worker additionally needs a `hf_merged/` directory
+produced by the vendor `runtime/triton_trtllm/scripts/convert_cosyvoice3_to_hf.py`
+script. Downloading the base checkpoint alone is insufficient. Run the worker
+with `PYTHONPATH` including the CosyVoice vendor packages and Matcha-TTS.
+See the [detailed environment and conversion guide](docs/native_training_and_synthesis.md).
 
-The content embedding is extracted using the scripts provided at [https://github.com/deep-privacy/SA-toolkit/tree/master/egs/asr/librispeech](https://github.com/deep-privacy/SA-toolkit/tree/master/egs/asr/librispeech). The pre-trained models can be obtained from the download links at the bottom of the document. Additionally, we will provide the content embeddings used in the VPC 2024 evaluation for readers to download and use for evaluation. Please check the specific guidance for extracting content embedding in the [SA-toolkit](SA-toolkit).
-
-The speaker embeddings used in training are extracted using the scripts provided at [https://github.com/Snowdar/asv-subtools/blob/master/pytorch/launcher/runEcapaXvector_online.py](https://github.com/Snowdar/asv-subtools/blob/master/pytorch/launcher/runEcapaXvector_online.py). In this project, they can be directly generated using the IDMap framework without extraction.
-
-The emotion labels are extracted using the SER model and scripts provided at [https://github.com/Sreyan88/MMER](https://github.com/Sreyan88/MMER). 
-
-#### Preparation step
-The pre-trained model, as well as the characteristics of the corresponding data set used in our evaluation during the experiment, will be uploaded after finishing.
-
-### Inference step
-#### IDMap-MLP inference
-After preparing the data, run `infer.py` to generate anonymized audio examples:
+## Download and check IDMap weights
 
 ```bash
-cd IDMap-MLP
-python infer.py
+mkdir -p checkpoints/downloaded
+curl -fL -o checkpoints/downloaded/qwen-idmap-mlp.pt \
+  https://github.com/VoicePrivacy/IDMap/releases/download/v0.1.0-native-idmap/qwen3tts_librispeech360_1024d_idmap_mlp_inference.pt
+curl -fL -o checkpoints/downloaded/cosy-idmap-mlp.pt \
+  https://github.com/VoicePrivacy/IDMap/releases/download/v0.1.0-native-idmap/cosyvoice3_campplus_192d_idmap_mlp_inference.pt
+sha256sum checkpoints/downloaded/*.pt  # macOS: shasum -a 256
 ```
-In the future, we will provide code for anonymizing LibriSpeech 360, dev, test and other data sets.
 
-#### IDMap-Diff inference
-After preparing the data, run `infer.py` to generate anonymized audio examples:
+Compare both hashes with [the checksum table](checkpoints/README.md) before
+loading. Only load trusted PyTorch checkpoints.
+
+## Train an IDMap in a new generator's speaker space
+
+1. Extract per-utterance **native** speaker embeddings from the exact vendor
+   model you will synthesize with. The provided extractors are
+   [`extract_qwen3tts_speaker_embeddings.py`](scripts/extract_qwen3tts_speaker_embeddings.py)
+   and [`extract_cosyvoice3_speaker_embeddings.py`](scripts/extract_cosyvoice3_speaker_embeddings.py).
+   Organize the input as `AUDIO_ROOT/SPEAKER_ID/.../recording.wav` or `.flac`.
+2. Save an `.npz` with float32 `embeddings[N,D]` and string `speaker_ids[N]`.
+   The extractors record the encoder fingerprint and audit batch/single output.
+   Speaker labels are training-only; never feed them to the inference worker.
+3. Train MLP or Diffusion with the **matching** dimension and speaker-space
+   label. The Qwen weight above used the additional
+   [native-diversity training recipe](scripts/train_idmap_native_diversity_full_20260904.py),
+   not the generic MLP command below.
 
 ```bash
-cd IDMap-Diff
-python infer.py
+python scripts/train_idmap_mlp.py \
+  --embeddings /path/to/native_embeddings.npz \
+  --speaker-space 'cosyvoice3-campplus-v1:<encoder-hash-prefix>' \
+  --output-dir /path/to/mlp-run
+python scripts/train_idmap_diff.py \
+  --embeddings /path/to/native_embeddings.npz \
+  --speaker-space 'cosyvoice3-campplus-v1:<encoder-hash-prefix>' \
+  --variant paper_vp_sde --output-dir /path/to/diff-run
+python scripts/export_idmap_inference_checkpoint.py \
+  --checkpoint /path/to/mlp-run/best.pt --output /path/to/mlp-inference.pt
 ```
-In the future, we will provide code for anonymizing LibriSpeech 360, dev, test and other data sets.
+
+Do not treat a finite training loss or a saved Diffusion checkpoint as proof of
+anonymous voice quality. Validate generated-vector distribution, identity
+separation, synthesized audio, WER, and privacy with the matching ASV protocol.
+
+## Synthesize anonymized audio
+
+Create one JSON object per line in `manifest.jsonl`:
+
+```json
+{"utterance_id":"session1-turn1","text":"Hello there.","anonymous_index":12345,"output_relative_path":"session1/turn1.wav"}
+{"utterance_id":"session1-turn2","text":"I agree.","anonymous_index":12345,"output_relative_path":"session1/turn2.wav"}
+```
+
+The repeated index intentionally preserves the same pseudo-speaker across
+turns. Different source identities need different indices, assigned by your
+own diarization/tracker. IDMap itself does **not** infer source identity or
+transcribe speech. The worker synthesizes the supplied text; it does not read
+source audio. For VPC-style per-utterance re-randomization, assign a different
+index to each utterance. The Qwen worker writes 16-kHz PCM WAVs.
+
+```bash
+CUDA_VISIBLE_DEVICES=0 python scripts/generate_qwen3tts_idmap_worker.py \
+  --manifest manifest.jsonl --output-dir /path/to/anonymized \
+  --model-dir /path/to/Qwen3-TTS-12Hz-0.6B-Base \
+  --idmap-checkpoint checkpoints/downloaded/qwen-idmap-mlp.pt \
+  --expected-speaker-space-prefix qwen3tts-12hz-0p6b-base-xvector-v1 \
+  --rank 0 --world-size 1 --batch-size 16
+```
+
+For CosyVoice3, use `generate_cosyvoice3_multigpu_worker.py` with the 192-D
+checkpoint, `--prompt-mode none`, the original vendor checkpoint and the
+converted `hf_merged` directory. Exact commands, batching caveats, and
+checkpoint-compatibility checks are in the
+[training and synthesis guide](docs/native_training_and_synthesis.md).
+To shard across GPUs, launch one worker per GPU, each with a distinct
+`CUDA_VISIBLE_DEVICES`, rank `0..N-1`, and common `--world-size N`; the manifest
+is deterministically partitioned by rank. Audit the output WAV count and ASR
+quality before reporting a result. Qwen generation supports batched text;
+batch/single waveforms are not claimed identical under stochastic decoding.
+
+## Legacy paper implementation
+
+The original `IDMap-MLP/`, `IDMap-Diff/`, `SA-toolkit/`, examples and figures
+remain for historical reproduction. They are not the backend-native code above;
+install their separate [`requirements.txt`](requirements.txt) only in an
+isolated legacy environment. Original paper figures: [EER/WER/UAR](figures/EER_WER_UAR.png),
+[Gvd](figures/Gvd.png), [RTF](figures/RTFs.png).

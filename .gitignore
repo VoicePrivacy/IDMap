@@ -1,20 +1,23 @@
-# 忽略音频文件（根据你的仓库，sample目录下有大量wav文件）
+# Runtime data and checkpoints (published weights belong in GitHub Releases).
 *.wav
 *.flac
 *.mp3
-sample/**/**/*.wav  # 忽略sample目录下所有内容（包括子目录）
-
-# 忽略模型权重文件（如果已通过Git LFS管理，可跳过；否则建议添加）
+*.npz
 *.pt
 *.pth
-*.bin
-models/**/*  # 若有models目录存放权重，直接忽略
+*.ckpt
+*.safetensors
+checkpoints/downloaded/
+models/
+runs/
 
-# 忽略Python虚拟环境和缓存
+# Python and local environments.
+.venv/
 venv/
 env/
 __pycache__/
-*.pyc
-*.pyo
-*.pyd
-
+*.py[cod]
+.pytest_cache/
+*.egg-info/
+build/
+dist/

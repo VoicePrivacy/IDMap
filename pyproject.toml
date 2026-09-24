@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "voiceprivacy-idmap-native"
+version = "0.1.0"
+description = "Backend-native IDMap training and anonymized speech synthesis"
+requires-python = ">=3.10"
+dependencies = ["numpy>=1.24", "torch>=2.2"]
+
+[project.optional-dependencies]
+audio = ["soundfile>=0.12", "torchaudio>=2.2"]
+qwen = ["qwen-tts", "soundfile>=0.12", "torchaudio>=2.2"]
+cosy-extraction = ["onnxruntime>=1.17", "soundfile>=0.12", "torchaudio>=2.2"]
+test = ["pytest>=8"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
