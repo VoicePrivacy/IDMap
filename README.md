@@ -14,17 +14,19 @@ IDMap can be trained in the speaker-conditioning space of a chosen synthesis bac
 
 ## Main Results from the IDMap Paper
 
+The tables below are recreated as scalable SVG text from the paper's published values. The original raster excerpts remain in [`figures/`](figures/) for comparison.
+
 ### EER, WER, and UAR
 
-![EER, WER, and UAR results](figures/EER_WER_UAR.png)
+![EER, WER, and UAR results](figures/EER_WER_UAR.svg)
 
 ### Gain of voice distinctness (Gvd)
 
-![Gvd results](figures/Gvd.png)
+![Gvd results](figures/Gvd.svg)
 
 ### Real-time factor (RTF)
 
-![Real-time factor results](figures/RTFs.png)
+![Real-time factor results](figures/RTFs.svg)
 
 ## Reproduce with Qwen3-TTS or CosyVoice3
 
@@ -107,4 +109,4 @@ python scripts/launch_idmap_generation.py --backend cosy --gpus 2,3 \
 
 Choose GPUs that are actually free. Inspect the launcher's audit and listen to generated WAVs before reporting evaluation results. For embedding extraction, IDMap training, checkpoint export, and backend-specific batch details, see the [training and synthesis guide](docs/native_training_and_synthesis.md).
 
-Original paper figures: [EER/WER/UAR](https://github.com/VoicePrivacy/IDMap/blob/main/figures/EER_WER_UAR.png), [Gvd](https://github.com/VoicePrivacy/IDMap/blob/main/figures/Gvd.png), [RTF](https://github.com/VoicePrivacy/IDMap/blob/main/figures/RTFs.png).
+Scalable result tables: [EER/WER/UAR](figures/EER_WER_UAR.svg), [Gvd](figures/Gvd.svg), [RTF](figures/RTFs.svg). Original paper excerpts: [EER/WER/UAR](figures/EER_WER_UAR.png), [Gvd](figures/Gvd.png), [RTF](figures/RTFs.png).
