@@ -33,8 +33,9 @@ none is linked here.
 Use separate environments for Qwen3-TTS and CosyVoice3, because their vendor
 dependencies differ. A CUDA-compatible PyTorch and torchaudio installation is
 required for synthesis; install those from the PyTorch selector for your CUDA
-runtime before installing this package. Python 3.10 or newer is required for
-the maintained code; the legacy code has separate requirements.
+runtime before installing this package. Python 3.11 is recommended for the
+maintained code; the legacy code has separate requirements. Verify that
+PyTorch wheels exist for your OS and Python version before setup.
 
 ```bash
 git clone https://github.com/VoicePrivacy/IDMap.git
@@ -70,6 +71,17 @@ sha256sum checkpoints/downloaded/*.pt  # macOS: shasum -a 256
 
 Compare both hashes with [the checksum table](checkpoints/README.md) before
 loading. Only load trusted PyTorch checkpoints.
+
+For a structural CPU check of the Qwen export (this does not validate audio
+quality), run:
+
+```bash
+python scripts/verify_idmap_checkpoint.py \
+  --checkpoint checkpoints/downloaded/qwen-idmap-mlp.pt \
+  --expected-sha256 0b723695b6c21d748e6fc583cbadeadad84eec7429a11beb8af7d5f63c92dabb \
+  --expected-dimension 1024 \
+  --expected-speaker-space qwen3tts-12hz-0p6b-base-xvector-v1:87114bb1ca84f9f4
+```
 
 ## Train an IDMap in a new generator's speaker space
 
