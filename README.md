@@ -1,16 +1,32 @@
-# IDMap: Index-to-Vector Mapping for Voice Anonymization
+# IDMap: A Pseudo-Speaker Generator Framework Based on Speaker Identity Index to Vector Mapping
 
-IDMap maps an anonymous identity index to a speaker-conditioning vector. Its speaker space can be adapted to different speech generators, making the same index-to-vector idea usable with multiple synthesis backends. This repository provides IDMap-MLP weights for **Qwen3-TTS** and **CosyVoice3**, links to their official generator weights, and the corresponding batched anonymization pipelines. The original paper implementation, SA-toolkit, and audio examples are organized in [`Original/`](Original/).
+## Audio Samples
 
-### Original paper results
+Listen to the [IDMap audio samples](https://voiceprivacy.github.io/IDMap/) (original speech and anonymized outputs). The corresponding sample files and demo page are in [`Original/`](Original/).
+
+## Introduction
+
+Voice anonymization aims to conceal a speaker's identity while retaining the information needed to understand the speech. In a speech-generation pipeline, this can be done by replacing the source speaker representation with one representing a pseudo-speaker. Choosing that representation matters: two pseudo-speakers should remain distinguishable, and generating many identities should not become prohibitively expensive.
+
+Existing approaches select or combine vectors from a reference pool, transform source-speaker vectors, or generate new vectors with a learned model. These approaches can leave different pseudo-speakers too similar, require a finite pool, or become costly when many identities are needed. The [IDMap paper](https://arxiv.org/abs/2511.06246) addresses pseudo-speaker uniqueness and generation efficiency by mapping an identity index to a speaker vector. An index is assigned without reuse when a new pseudo-speaker is required. The paper studies both IDMap-MLP and IDMap-Diff and evaluates privacy, speech utility, voice distinctness, and computational cost, including large-scale settings.
+
+IDMap can be trained in the speaker-conditioning space of a chosen synthesis backend. Here we provide IDMap-MLP weights and batched synthesis pipelines for **Qwen3-TTS** and **CosyVoice3**, with links to the generators' official weights. The original paper implementation and SA-toolkit are in [`Original/`](Original/). IDMap-Diffusion extension code is **under review**; the reproduction steps below use IDMap-MLP.
+
+## Main Results from the IDMap Paper
+
+### EER, WER, and UAR
 
 ![EER, WER, and UAR results](figures/EER_WER_UAR.png)
 
+### Gain of voice distinctness (Gvd)
+
 ![Gvd results](figures/Gvd.png)
+
+### Real-time factor (RTF)
 
 ![Real-time factor results](figures/RTFs.png)
 
-IDMap-Diffusion: **code under review**. The reproducible steps below use IDMap-MLP.
+## Reproduce with Qwen3-TTS or CosyVoice3
 
 ## Step 1 — Set up the environment
 
