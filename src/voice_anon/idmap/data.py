@@ -21,10 +21,20 @@ class SpeakerEmbeddingCorpus:
         cls,
         path: str | Path,
         expected_dimension: int | None = None,
+        expected_speaker_space: str | None = None,
     ) -> "SpeakerEmbeddingCorpus":
         with np.load(path, allow_pickle=False) as archive:
             embeddings = np.asarray(archive["embeddings"], dtype=np.float32)
             speaker_ids = np.asarray(archive["speaker_ids"]).astype(str)
+            if expected_speaker_space is not None:
+                if "speaker_space" not in archive:
+                    raise ValueError("embedding archive has no speaker_space provenance")
+                recorded_space = str(np.asarray(archive["speaker_space"]).item())
+                if recorded_space != expected_speaker_space:
+                    raise ValueError(
+                        "embedding archive speaker_space mismatch: "
+                        f"{recorded_space!r} != {expected_speaker_space!r}"
+                    )
         if embeddings.ndim != 2 or embeddings.shape[1] < 1:
             raise ValueError(
                 "embeddings must have shape (utterances, positive_dimension); "
