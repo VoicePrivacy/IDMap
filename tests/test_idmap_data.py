@@ -39,6 +39,25 @@ class SpeakerEmbeddingCorpusTest(unittest.TestCase):
             own_indices = corpus.utterance_indices_by_speaker[int(identity)]
             self.assertFalse(any(np.array_equal(auxiliary, embeddings[i]) for i in own_indices))
 
+    def test_training_rejects_wrong_or_missing_speaker_space(self) -> None:
+        embeddings = np.zeros((4, 192), dtype=np.float32)
+        speaker_ids = np.array(["a", "a", "b", "b"])
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "embeddings.npz"
+            np.savez(path, embeddings=embeddings, speaker_ids=speaker_ids)
+            with self.assertRaisesRegex(ValueError, "no speaker_space"):
+                SpeakerEmbeddingCorpus.load(path, expected_speaker_space="cosy:123")
+            np.savez(
+                path, embeddings=embeddings, speaker_ids=speaker_ids,
+                speaker_space=np.asarray("cosy:123"),
+            )
+            with self.assertRaisesRegex(ValueError, "speaker_space mismatch"):
+                SpeakerEmbeddingCorpus.load(path, expected_speaker_space="qwen:456")
+            corpus = SpeakerEmbeddingCorpus.load(
+                path, expected_speaker_space="cosy:123"
+            )
+            self.assertEqual(corpus.embeddings.shape, (4, 192))
+
 
 if __name__ == "__main__":
     unittest.main()
